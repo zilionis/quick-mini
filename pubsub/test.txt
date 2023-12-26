@@ -1,0 +1,96 @@
+func (server *Server) HandleSubscriber(connection quic.Connection) {
+	log.Println("New subscriber connected", connection.RemoteAddr().String())
+}
+
+func (server *Server) HandlePublisher(connection quic.Connection) {
+	log.Println("New publisher connected", connection.RemoteAddr().String())
+
+	//stream, err := connection.AcceptStream(context.Background())
+	//if err != nil {
+	//	log.Panic("Error in publisher stream:\n", err)
+	//
+	//	return
+	//}
+	//
+	//server.publishersMu.Lock()
+	//defer server.publishersMu.Unlock()
+	//
+	////server.subscribers[stream] = struct{}{}
+	//
+	//log.Println("foo?1")
+	//decoder := json.NewDecoder(stream)
+	//
+	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	//defer cancel()
+	//
+	//for {
+	//	select {
+	//	case <-ctx.Done():
+	//		log.Println("Publisher session timeout")
+	//		return
+	//	default:
+	//		var receivedMessage Message
+	//		err = decoder.Decode(&receivedMessage)
+	//		if err != nil {
+	//			log.Println("Decoing errror:", err)
+	//			break
+	//		}
+	//
+	//		log.Println("pongas", receivedMessage.Content, receivedMessage.Timestamp)
+	//		log.Println("bla")
+	//	}
+	//}
+
+	stream, err := connection.AcceptStream(context.Background())
+	if err != nil {
+		log.Println(err)
+	}
+
+	//server.subscribersM.Lock()
+	//server.subscribers[stream] = struct{}{}
+	//server.subscribersM.Unlock()
+
+	go server.handlePublisherConnection(stream)
+}
+
+func (server *Server) handlePublisherConnection(stream quic.Stream) {
+	defer func() {
+		delete(server.subscribers, stream)
+		server.subscribersM.Unlock()
+	}()
+
+	server.subscribersM.Lock()
+
+	decoder := gob.NewDecoder(stream)
+	for {
+		var receivedMessage Message
+		//err := decoder.Decode(&receivedMessage)
+		err := decoder.Decode(&receivedMessage)
+		if err != nil {
+			log.Println(err)
+		}
+
+		log.Println("pongas", receivedMessage.Content, receivedMessage.Timestamp)
+	}
+}
+
+func (server *Server) NotifyPublisherConnection(publisherID int, stream quic.Stream) {
+	//server.publishersMu.Lock()
+	//defer server.publishersMu.Unlock()
+
+	server.publishers[publisherID] = stream
+
+	if len(server.subscribers) == 0 {
+		fmt.Printf("No subscribers connected. Informing publisher %d\n", publisherID)
+		_, err := stream.Write([]byte("No subscribers connected"))
+		if err != nil {
+			log.Println("Error writing to publisher:", err)
+		}
+	} else {
+		fmt.Printf("Notifying publisher %d about subscriber connection\n", publisherID)
+		_, err := stream.Write([]byte("Subscriber connected"))
+		if err != nil {
+			log.Println("Error writing to publisher:", err)
+		}
+	}
+}
