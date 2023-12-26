@@ -10,10 +10,10 @@ import (
 	"os"
 )
 
-func Logger(appName string) *log.Logger {
+func Logger(appName string, background string) *log.Logger {
 	return log.New(
 		os.Stderr,
-		color.Ize(color.Bold+color.BlueBackground+color.White, "[ "+appName+" ]")+" ",
+		color.Ize(color.Bold+background+color.White, "[ "+appName+" ]")+" ",
 		log.Ltime,
 	)
 }

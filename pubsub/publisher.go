@@ -64,8 +64,6 @@ func (server *Server) NotifyPublisher(stream quic.Stream, subscribersBefore int)
 func (server *Server) sendToSubscribers(message Message) {
 	server.mu.RLock()
 
-	server.log.Println("Sending msg to subscribers from", message.Sender, "total: ", len(server.subscribers))
-
 	for subscriberStream := range server.subscribers {
 		err := message.SendToStream(subscriberStream)
 		if err != nil {

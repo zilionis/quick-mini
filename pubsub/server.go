@@ -7,6 +7,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
+	"github.com/TwiN/go-color"
 	"github.com/quic-go/quic-go"
 	"log"
 	"math/big"
@@ -24,7 +25,7 @@ func CreateServer() *Server {
 	return &Server{
 		subscribers: make(map[quic.Stream]struct{}),
 		name:        "Server",
-		log:         Logger("Server"),
+		log:         Logger("Server", color.BlueBackground),
 	}
 }
 
@@ -51,6 +52,13 @@ func (server *Server) ListenAndServe(port *int, appName string, serveWithConnect
 
 		go serveWithConnection(connection)
 	}
+}
+
+func (server *Server) GetSubscribersCount() int {
+	server.mu.RLock()
+	server.mu.RUnlock()
+
+	return len(server.subscribers)
 }
 
 func GenerateTLSConfig() *tls.Config {

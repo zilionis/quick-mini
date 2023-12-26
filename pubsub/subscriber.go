@@ -7,8 +7,8 @@ import (
 
 func (server *Server) HandleSubscriber(connection quic.Connection) {
 
-	server.log.Println("Subscriber connected: ", connection.RemoteAddr().String(), ". Total now:", len(server.subscribers)+1)
-
+	server.log.Println("Subscriber connected: ", connection.RemoteAddr().String(), ". Total now:", server.GetSubscribersCount()+1)
+	server.GetSubscribersCount()
 	stream, err := connection.OpenStreamSync(context.Background())
 	if err != nil {
 		server.log.Println("Subscriber AcceptStream err: ", err)
