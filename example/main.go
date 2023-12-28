@@ -7,10 +7,10 @@ import (
 
 func main() {
 	config := pubsub.HandleConfig()
-	server := pubsub.CreateServer()
+	server := pubsub.CreateServer(*config.Name)
 
-	go server.ListenAndServe(config.PortSub, "Subscriber", server.HandleSubscriber)
-	go server.ListenAndServe(config.PortPub, "Publisher", server.HandlePublisher)
+	go server.ListenAndServe(config.PortSub, "Subscriber server", server.HandleSubscriber)
+	go server.ListenAndServe(config.PortPub, "Publisher server", server.HandlePublisher)
 
 	go pubsub.PublisherApp("Pub__1", 3, *config.PortPub)
 	go pubsub.PublisherApp("Pub__2", 7, *config.PortPub)

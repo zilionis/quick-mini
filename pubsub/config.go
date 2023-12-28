@@ -9,7 +9,6 @@ import (
 type AppConfig struct {
 	PortSub *int
 	PortPub *int
-	Verbose *bool
 	Name    *string
 }
 
@@ -18,7 +17,6 @@ func HandleConfig() AppConfig {
 	config := AppConfig{
 		PortSub: flag.Int("port", 6001, "PortSub number for clientSubscriber"),
 		PortPub: flag.Int("portPub", 6002, "PortSub number for publisher"),
-		Verbose: flag.Bool("v", false, "verbose"),
 		Name:    flag.String("name", "Server", "Name"),
 	}
 
@@ -29,6 +27,8 @@ func HandleConfig() AppConfig {
 
 	if len(args) > 0 && args[0] == "help" {
 		flag.Usage()
+
+		os.Exit(3)
 	}
 
 	return config

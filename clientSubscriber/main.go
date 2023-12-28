@@ -7,5 +7,5 @@ import (
 func main() {
 	config := pubsub.HandleConfig()
 
-	pubsub.SubscriberApp("Publisher_1", *config.PortSub)
+	pubsub.SubscriberApp("Subscriber_1", *config.PortSub)
 }

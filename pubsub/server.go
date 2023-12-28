@@ -21,11 +21,11 @@ type Server struct {
 	name        string
 }
 
-func CreateServer() *Server {
+func CreateServer(appName string) *Server {
 	return &Server{
 		subscribers: make(map[quic.Stream]struct{}),
-		name:        "Server",
-		log:         Logger("Server", color.BlueBackground),
+		name:        appName,
+		log:         Logger(appName, color.BlueBackground),
 	}
 }
 
@@ -38,7 +38,7 @@ func (server *Server) ListenAndServe(port *int, appName string, serveWithConnect
 		return
 	}
 	defer func() {
-		server.log.Printf("[ %v ] Listening on port\n", appName)
+		server.log.Printf("[ %v ] Closing listening on port\n", appName)
 		_ = listener.Close()
 	}()
 

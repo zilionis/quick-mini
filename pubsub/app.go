@@ -12,7 +12,7 @@ import (
 
 func Logger(appName string, background string) *log.Logger {
 	return log.New(
-		os.Stderr,
+		os.Stdout,
 		color.Ize(color.Bold+background+color.White, "[ "+appName+" ]")+" ",
 		log.Ltime,
 	)

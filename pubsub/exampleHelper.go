@@ -12,6 +12,7 @@ import (
 
 func PublisherApp(appName string, tickerDuration time.Duration, publisherPort int) {
 	logger := Logger(appName, color.BlackBackground)
+	logger.Println(appName, "Is launched")
 
 	stream := CreateConnectionStreamSync(&publisherPort)
 	defer stream.Close()
@@ -29,14 +30,15 @@ func PublisherApp(appName string, tickerDuration time.Duration, publisherPort in
 	}()
 
 	for {
-		messageReceiver(&stream, logger)
+		MessageReceiver(&stream, logger)
 	}
 }
 
 func SubscriberApp(appName string, subscriberPort int) {
 	logger := Logger(appName, color.GreenBackground)
-	connection := CreateConnection(&subscriberPort)
+	logger.Println(appName, "Is launched")
 
+	connection := CreateConnection(&subscriberPort)
 	stream, err := connection.AcceptStream(context.Background())
 	if err != nil {
 
@@ -44,13 +46,11 @@ func SubscriberApp(appName string, subscriberPort int) {
 	}
 
 	for {
-		messageReceiver(&stream, logger)
+		MessageReceiver(&stream, logger)
 	}
-
-	select {}
 }
 
-func messageReceiver(stream *quic.Stream, logger *log.Logger) {
+func MessageReceiver(stream *quic.Stream, logger *log.Logger) {
 	decoder := gob.NewDecoder(*stream)
 	var receivedMessage Message
 	err := decoder.Decode(&receivedMessage)
